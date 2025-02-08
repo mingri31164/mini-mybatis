@@ -1,10 +1,12 @@
 package com.mybatis.binding;
 
+import cn.hutool.core.lang.ClassScanner;
+import com.mybatis.session.Configuration;
 import com.mybatis.session.SqlSession;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import cn.hutool.core.lang.ClassScanner;
+
 
 /**
  * @Description: 映射器注册机
@@ -12,6 +14,12 @@ import cn.hutool.core.lang.ClassScanner;
  * @Date: 2025/2/7 22:37
  **/
 public class MapperRegistry {
+
+    private Configuration config;
+
+    public MapperRegistry(Configuration config) {
+        this.config = config;
+    }
 
     /**
      * 将已添加的映射器代理加入到 HashMap
