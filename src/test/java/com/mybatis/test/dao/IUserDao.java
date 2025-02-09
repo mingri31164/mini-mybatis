@@ -1,8 +1,10 @@
 package com.mybatis.test.dao;
 
 
+import com.mybatis.test.pojo.User;
+
 public interface IUserDao {
 
-    String queryUserInfoById(String uId);
+    User queryUserInfoById(long uId);
 
 }
