@@ -2,6 +2,8 @@ package com.mybatis.session;
 
 import com.mybatis.binding.MapperRegistry;
 import com.mybatis.datasource.druid.DruidDataSourceFactory;
+import com.mybatis.datasource.pooled.PooledDataSourceFactory;
+import com.mybatis.datasource.unpooled.UnpooledDataSourceFactory;
 import com.mybatis.mapping.Environment;
 import com.mybatis.mapping.MappedStatement;
 import com.mybatis.transaction.jdbc.JdbcTransactionFactory;
@@ -36,6 +38,8 @@ public class Configuration {
     public Configuration() {
         typeAliasRegistry.registerAlias("JDBC", JdbcTransactionFactory.class);
         typeAliasRegistry.registerAlias("DRUID", DruidDataSourceFactory.class);
+        typeAliasRegistry.registerAlias("UNPOOLED", UnpooledDataSourceFactory.class);
+        typeAliasRegistry.registerAlias("POOLED", PooledDataSourceFactory.class);
     }
 
     public void addMappers(String packageName) {
