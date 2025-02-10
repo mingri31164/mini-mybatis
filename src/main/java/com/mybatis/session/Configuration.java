@@ -4,8 +4,16 @@ import com.mybatis.binding.MapperRegistry;
 import com.mybatis.datasource.druid.DruidDataSourceFactory;
 import com.mybatis.datasource.pooled.PooledDataSourceFactory;
 import com.mybatis.datasource.unpooled.UnpooledDataSourceFactory;
+import com.mybatis.executor.Executor;
+import com.mybatis.executor.SimpleExecutor;
+import com.mybatis.executor.resultset.DefaultResultSetHandler;
+import com.mybatis.executor.resultset.ResultSetHandler;
+import com.mybatis.executor.statement.PreparedStatementHandler;
+import com.mybatis.executor.statement.StatementHandler;
+import com.mybatis.mapping.BoundSql;
 import com.mybatis.mapping.Environment;
 import com.mybatis.mapping.MappedStatement;
+import com.mybatis.transaction.Transaction;
 import com.mybatis.transaction.jdbc.JdbcTransactionFactory;
 import com.mybatis.type.TypeAliasRegistry;
 
@@ -78,4 +86,24 @@ public class Configuration {
         this.environment = environment;
     }
 
+    /**
+     * 创建结果集处理器
+     */
+    public ResultSetHandler newResultSetHandler(Executor executor, MappedStatement mappedStatement, BoundSql boundSql) {
+        return new DefaultResultSetHandler(executor, mappedStatement, boundSql);
+    }
+
+    /**
+     * 生产执行器
+     */
+    public Executor newExecutor(Transaction transaction) {
+        return new SimpleExecutor(this, transaction);
+    }
+
+    /**
+     * 创建语句处理器
+     */
+    public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameter, ResultHandler resultHandler, BoundSql boundSql) {
+        return new PreparedStatementHandler(executor, mappedStatement, parameter, resultHandler, boundSql);
+    }
 }

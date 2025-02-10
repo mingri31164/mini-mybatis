@@ -1,6 +1,7 @@
 package com.mybatis.session.defaults;
 
 
+import com.mybatis.executor.Executor;
 import com.mybatis.mapping.BoundSql;
 import com.mybatis.mapping.Environment;
 import com.mybatis.mapping.MappedStatement;
@@ -20,9 +21,12 @@ import java.util.List;
 public class DefaultSqlSession implements SqlSession {
 
     private Configuration configuration;
+    private Executor executor;
 
-    public DefaultSqlSession(Configuration configuration) {
+
+    public DefaultSqlSession(Configuration configuration, Executor executor) {
         this.configuration = configuration;
+        this.executor = executor;
     }
 
 
