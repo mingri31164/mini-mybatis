@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 /**
  * @Description: 有连接池的数据源
  * @Author: mingri31164
- * @Date: 2025/2/9 22:53
+ * @Date: 2025/2/11 20:24
  **/
 public class PooledDataSource implements DataSource {
 
@@ -31,7 +31,7 @@ public class PooledDataSource implements DataSource {
     protected int poolMaximumIdleConnections = 5;
     // 在被强制返回之前,池中连接被检查的时间
     protected int poolMaximumCheckoutTime = 20000;
-    // 这是给连接池一个打印日志状态机会的低层次设置,还有重新尝试获得连接, 这些情况下往往需要很长时间 为了避免连接池没有配置时静默失败)。
+    // 这是给连接池一个打印日志状态机会的低层次设置,还有重新 尝试获得连接, 这些情况下往往需要很长时间 为了避免连接池没有配置时静默失 败)。
     protected int poolTimeToWait = 20000;
     // 发送到数据的侦测查询,用来验证连接是否正常工作,并且准备 接受请求。默认是“NO PING QUERY SET” ,这会引起许多数据库驱动连接由一 个错误信息而导致失败
     protected String poolPingQuery = "NO PING QUERY SET";
@@ -54,9 +54,6 @@ public class PooledDataSource implements DataSource {
                 // 如果空闲链接小于设定数量，也就是太少时
                 if (state.idleConnections.size() < poolMaximumIdleConnections && connection.getConnectionTypeCode() == expectedConnectionTypeCode) {
                     state.accumulatedCheckoutTime += connection.getCheckoutTime();
-                    // 它首先检查数据库连接是否处于自动提交模式，如果不是，则调用rollback()方法执行回滚操作。
-                    // 在MyBatis中，如果没有开启自动提交模式，则需要手动提交或回滚事务。因此，这段代码可能是在确保操作完成后，如果没有开启自动提交模式，则执行回滚操作。
-                    // 总的来说，这段代码用于保证数据库的一致性，确保操作完成后，如果未开启自动提交模式，则执行回滚操作。
                     if (!connection.getRealConnection().getAutoCommit()) {
                         connection.getRealConnection().rollback();
                     }
@@ -343,6 +340,21 @@ public class PooledDataSource implements DataSource {
         forceCloseAll();
     }
 
+    public String getDriver() {
+        return dataSource.getDriver();
+    }
+
+    public String getUrl() {
+        return dataSource.getUrl();
+    }
+
+    public String getUsername() {
+        return dataSource.getUsername();
+    }
+
+    public String getPassword() {
+        return dataSource.getPassword();
+    }
 
     public void setDefaultAutoCommit(boolean defaultAutoCommit) {
         dataSource.setAutoCommit(defaultAutoCommit);

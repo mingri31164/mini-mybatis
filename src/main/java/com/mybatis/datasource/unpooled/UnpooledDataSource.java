@@ -9,10 +9,11 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
+
 /**
  * @Description: 无池化数据源实现
  * @Author: mingri31164
- * @Date: 2025/2/9 22:54
+ * @Date: 2025/2/11 20:25
  **/
 public class UnpooledDataSource implements DataSource {
 
@@ -40,6 +41,16 @@ public class UnpooledDataSource implements DataSource {
             Driver driver = drivers.nextElement();
             registeredDrivers.put(driver.getClass().getName(), driver);
         }
+    }
+
+    public UnpooledDataSource() {
+    }
+
+    public UnpooledDataSource(String driver, String url, String username, String password) {
+        this.driver = driver;
+        this.url = url;
+        this.username = username;
+        this.password = password;
     }
 
     /**
@@ -248,5 +259,4 @@ public class UnpooledDataSource implements DataSource {
     public void setDefaultTransactionIsolationLevel(Integer defaultTransactionIsolationLevel) {
         this.defaultTransactionIsolationLevel = defaultTransactionIsolationLevel;
     }
-
 }
