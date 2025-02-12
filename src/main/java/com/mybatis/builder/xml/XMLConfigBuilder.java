@@ -2,11 +2,7 @@ package com.mybatis.builder.xml;
 
 import com.mybatis.builder.BaseBuilder;
 import com.mybatis.datasource.DataSourceFactory;
-import com.mybatis.io.Resources;
-import com.mybatis.mapping.BoundSql;
 import com.mybatis.mapping.Environment;
-import com.mybatis.mapping.MappedStatement;
-import com.mybatis.mapping.SqlCommandType;
 import com.mybatis.session.Configuration;
 import com.mybatis.transaction.TransactionFactory;
 import org.dom4j.Document;
@@ -16,16 +12,18 @@ import org.dom4j.io.SAXReader;
 import org.xml.sax.InputSource;
 
 import javax.sql.DataSource;
+import java.io.InputStream;
 import java.io.Reader;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
+import java.util.Properties;
+import com.mybatis.io.Resources;
+
 
 
 /**
  * @Description: XML配置构建器，建造者模式，继承BaseBuilder
  * @Author: mingri31164
- * @Date: 2025/2/8 22:07
+ * @Date: 2025/2/12 19:13
  **/
 public class XMLConfigBuilder extends BaseBuilder {
 
@@ -61,7 +59,21 @@ public class XMLConfigBuilder extends BaseBuilder {
         return configuration;
     }
 
-
+    /**
+     * <environments default="development">
+     * <environment id="development">
+     * <transactionManager type="JDBC">
+     * <property name="..." value="..."/>
+     * </transactionManager>
+     * <dataSource type="POOLED">
+     * <property name="driver" value="${driver}"/>
+     * <property name="url" value="${url}"/>
+     * <property name="username" value="${username}"/>
+     * <property name="password" value="${password}"/>
+     * </dataSource>
+     * </environment>
+     * </environments>
+     */
     private void environmentsElement(Element context) throws Exception {
         String environment = context.attributeValue("default");
 
@@ -93,48 +105,22 @@ public class XMLConfigBuilder extends BaseBuilder {
         }
     }
 
-
+    /*
+     * <mappers>
+     *	 <mapper resource="org/mybatis/builder/AuthorMapper.xml"/>
+     *	 <mapper resource="org/mybatis/builder/BlogMapper.xml"/>
+     *	 <mapper resource="org/mybatis/builder/PostMapper.xml"/>
+     * </mappers>
+     */
     private void mapperElement(Element mappers) throws Exception {
         List<Element> mapperList = mappers.elements("mapper");
         for (Element e : mapperList) {
             String resource = e.attributeValue("resource");
-            Reader reader = Resources.getResourceAsReader(resource);
-            SAXReader saxReader = new SAXReader();
-            Document document = saxReader.read(new InputSource(reader));
-            Element root = document.getRootElement();
-            //命名空间
-            String namespace = root.attributeValue("namespace");
+            InputStream inputStream = Resources.getResourceAsStream(resource);
 
-            // SELECT
-            List<Element> selectNodes = root.elements("select");
-            for (Element node : selectNodes) {
-                String id = node.attributeValue("id");
-                String parameterType = node.attributeValue("parameterType");
-                String resultType = node.attributeValue("resultType");
-                String sql = node.getText();
-
-                // ? 匹配
-                Map<Integer, String> parameter = new HashMap<>();
-                Pattern pattern = Pattern.compile("(#\\{(.*?)})");
-                Matcher matcher = pattern.matcher(sql);
-                for (int i = 1; matcher.find(); i++) {
-                    String g1 = matcher.group(1);
-                    String g2 = matcher.group(2);
-                    parameter.put(i, g2);
-                    sql = sql.replace(g1, "?");
-                }
-
-                BoundSql boundSql = new BoundSql(sql, parameter, parameterType, resultType);
-                String msId = namespace + "." + id;
-                String nodeName = node.getName();
-                SqlCommandType sqlCommandType = SqlCommandType.valueOf(nodeName.toUpperCase(Locale.ENGLISH));
-                MappedStatement mappedStatement = new MappedStatement.Builder(configuration, msId, sqlCommandType, boundSql).build();
-                // 添加解析 SQL
-                configuration.addMappedStatement(mappedStatement);
-            }
-
-            // 注册Mapper映射器
-            configuration.addMapper(Resources.classForName(namespace));
+            // 在for循环里每个mapper都重新new一个XMLMapperBuilder，来解析
+            XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource);
+            mapperParser.parse();
         }
     }
 
