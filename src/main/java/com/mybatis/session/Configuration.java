@@ -6,6 +6,7 @@ import com.mybatis.datasource.pooled.PooledDataSourceFactory;
 import com.mybatis.datasource.unpooled.UnpooledDataSourceFactory;
 import com.mybatis.executor.Executor;
 import com.mybatis.executor.SimpleExecutor;
+import com.mybatis.executor.parameter.ParameterHandler;
 import com.mybatis.executor.resultset.DefaultResultSetHandler;
 import com.mybatis.executor.resultset.ResultSetHandler;
 import com.mybatis.executor.statement.PreparedStatementHandler;
@@ -18,6 +19,7 @@ import com.mybatis.reflection.factory.DefaultObjectFactory;
 import com.mybatis.reflection.factory.ObjectFactory;
 import com.mybatis.reflection.wrapper.DefaultObjectWrapperFactory;
 import com.mybatis.reflection.wrapper.ObjectWrapperFactory;
+import com.mybatis.scripting.LanguageDriver;
 import com.mybatis.scripting.LanguageDriverRegistry;
 import com.mybatis.scripting.xmltags.XMLLanguageDriver;
 import com.mybatis.transaction.Transaction;
@@ -152,5 +154,15 @@ public class Configuration {
 
     public LanguageDriverRegistry getLanguageRegistry() {
         return languageRegistry;
+    }
+    public ParameterHandler newParameterHandler(MappedStatement mappedStatement, Object parameterObject, BoundSql boundSql) {
+        // 创建参数处理器
+        ParameterHandler parameterHandler = mappedStatement.getLang().createParameterHandler(mappedStatement, parameterObject, boundSql);
+        // 插件的一些参数，也是在这里处理，暂时不添加这部分内容 interceptorChain.pluginAll(parameterHandler);
+        return parameterHandler;
+    }
+
+    public LanguageDriver getDefaultScriptingLanguageInstance() {
+        return languageRegistry.getDefaultDriver();
     }
 }

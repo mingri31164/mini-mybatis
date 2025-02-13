@@ -10,4 +10,10 @@
         where id = #{id}
     </select>
 
+    <select id="queryUserInfo" parameterType="com.mybatis.test.pojo.User" resultType="com.mybatis.test.pojo.User">
+        SELECT id, userId, userName, userHead
+        FROM user
+        where id = #{id} and userId = #{userId}
+    </select>
+
 </mapper>

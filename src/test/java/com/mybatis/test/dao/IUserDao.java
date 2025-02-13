@@ -6,5 +6,7 @@ import com.mybatis.test.pojo.User;
 public interface IUserDao {
 
     User queryUserInfoById(long uId);
+    User queryUserInfo(User req);
+
 
 }
