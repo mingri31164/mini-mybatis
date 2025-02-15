@@ -97,6 +97,12 @@
             <artifactId>ognl</artifactId>
             <version>3.3.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.10.2</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- LOGGING end -->
     </dependencies>
 
